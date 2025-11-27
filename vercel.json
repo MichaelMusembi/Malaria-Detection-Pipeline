@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "name": "malaria-detection-api",
+  "builds": [
+    {
+      "src": "main.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "main.py"
+    }
+  ],
+  "env": {
+    "PYTHONPATH": "./src",
+    "USE_LIGHTWEIGHT_MODEL": "true"
+  },
+  "functions": {
+    "main.py": {
+      "maxDuration": 30
+    }
+  }
+}

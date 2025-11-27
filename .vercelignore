@@ -1,0 +1,10 @@
+# Vercel ignore file - exclude large files for deployment
+models/malaria_cnn_model.h5
+models/*.h5
+__pycache__/
+*.pyc
+.git/
+data/
+temp_training/
+.env
+*.log

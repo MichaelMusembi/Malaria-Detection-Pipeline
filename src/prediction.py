@@ -41,7 +41,7 @@ class MalariaPredictionService:
     
     def load_model(self, model_path: Optional[str] = None) -> None:
         """
-        Loads the trained model from disk.
+        Loads the trained model from disk or creates a lightweight demo model.
         
         Args:
             model_path: Optional custom path to model file
@@ -49,11 +49,20 @@ class MalariaPredictionService:
         if model_path:
             self._model_path = model_path
         
+        # Check if we're in lightweight mode (for Vercel deployment)
+        use_lightweight = os.getenv("USE_LIGHTWEIGHT_MODEL") == "true"
+        
         # For debugging: print the path we're trying to load
         print(f"🔍 Attempting to load model from: {self._model_path}")
         print(f"🔍 File exists check: {os.path.exists(self._model_path)}")
+        print(f"🔍 Lightweight mode: {use_lightweight}")
         
-        if not os.path.exists(self._model_path):
+        if not os.path.exists(self._model_path) or use_lightweight:
+            if use_lightweight:
+                print("🚀 Creating lightweight demo model for deployment...")
+                self._create_demo_model()
+                return
+            
             # Try to list the models directory to see what's available
             models_dir = os.path.dirname(self._model_path)
             if os.path.exists(models_dir):
@@ -61,10 +70,9 @@ class MalariaPredictionService:
                 for f in os.listdir(models_dir):
                     print(f"   - {f}")
             
-            raise FileNotFoundError(
-                f"Model file not found: {self._model_path}. "
-                "Please train the model first using src/model.py"
-            )
+            print(f"⚠️ Warning: Could not load model: Model file not found: {self._model_path}. Please train the model first using src/model.py")
+            print("   Model will be loaded on first prediction request")
+            return
         
         print(f"📥 Loading model from {self._model_path}...")
         start_time = time.time()
@@ -74,6 +82,42 @@ class MalariaPredictionService:
         
         load_time = time.time() - start_time
         print(f"✅ Model loaded successfully in {load_time:.2f}s")
+    
+    def _create_demo_model(self) -> None:
+        """
+        Creates a lightweight demo model for deployment purposes.
+        """
+        print("🔧 Building lightweight MobileNetV2 model...")
+        
+        # Create a simple MobileNetV2-based model
+        base_model = tf.keras.applications.MobileNetV2(
+            weights='imagenet',
+            include_top=False,
+            input_shape=(IMG_HEIGHT, IMG_WIDTH, 3)
+        )
+        
+        # Freeze the base model
+        base_model.trainable = False
+        
+        # Add custom classification head
+        model = tf.keras.Sequential([
+            base_model,
+            tf.keras.layers.GlobalAveragePooling2D(),
+            tf.keras.layers.Dropout(0.2),
+            tf.keras.layers.Dense(1, activation='sigmoid', name='predictions')
+        ])
+        
+        # Compile the model
+        model.compile(
+            optimizer='adam',
+            loss='binary_crossentropy',
+            metrics=['accuracy']
+        )
+        
+        self._model = model
+        self._model_loaded = True
+        print("✅ Lightweight demo model created successfully!")
+        print("ℹ️  Note: This is a demo model. For production, use the trained model.")
     
     def get_model(self) -> keras.Model:
         """
