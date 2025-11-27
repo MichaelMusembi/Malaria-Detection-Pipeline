@@ -49,7 +49,18 @@ class MalariaPredictionService:
         if model_path:
             self._model_path = model_path
         
+        # For debugging: print the path we're trying to load
+        print(f"🔍 Attempting to load model from: {self._model_path}")
+        print(f"🔍 File exists check: {os.path.exists(self._model_path)}")
+        
         if not os.path.exists(self._model_path):
+            # Try to list the models directory to see what's available
+            models_dir = os.path.dirname(self._model_path)
+            if os.path.exists(models_dir):
+                print(f"🔍 Available files in {models_dir}:")
+                for f in os.listdir(models_dir):
+                    print(f"   - {f}")
+            
             raise FileNotFoundError(
                 f"Model file not found: {self._model_path}. "
                 "Please train the model first using src/model.py"

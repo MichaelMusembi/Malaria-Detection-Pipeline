@@ -13,8 +13,6 @@ services:
         value: "2"
       - key: PYTHONUNBUFFERED
         value: "1"
-      - key: MODEL_PATH
-        value: /app/models/malaria_mobilenet.keras
         
   - type: web
     name: malaria-detection-ui

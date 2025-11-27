@@ -42,11 +42,11 @@ textColor = "#262730"\n\
 [logger]\n\
 level = "info"' > /root/.streamlit/config.toml
 
-# Expose port (Railway will use PORT environment variable)
+# Expose port (Render will use PORT environment variable)
 EXPOSE 8501
 
-# Health check for Railway
-HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+# Health check for Render
+HEALTHCHECK --interval=30s --timeout=10s --start-period=45s --retries=3 \
     CMD curl -f http://localhost:8501/_stcore/health || exit 1
 
 # Use Render's PORT environment variable with fallback

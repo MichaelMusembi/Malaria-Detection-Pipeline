@@ -33,7 +33,12 @@ async def lifespan(app: FastAPI):
     print("🚀 Starting Malaria Detection API...")
     service = get_prediction_service()
     try:
-        service.load_model()
+        # Use MODEL_PATH environment variable if set
+        model_path = os.getenv("MODEL_PATH")
+        if not model_path:
+            # Default path for Docker container (running from /app/src)
+            model_path = "../models/malaria_mobilenet.keras"
+        service.load_model(model_path)
         print("✅ Model loaded successfully")
     except Exception as e:
         print(f"⚠️ Warning: Could not load model: {e}")
