@@ -16,6 +16,7 @@ aiofiles>=23.0.0
 
 # UI
 streamlit>=1.28.0
+plotly>=5.17.0
 
 # Data handling
 kagglehub>=0.2.0
