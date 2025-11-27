@@ -29,7 +29,7 @@ st.set_page_config(
 )
 
 # API Configuration
-API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8080")
 
 # Enhanced Custom CSS for Beautiful Presentation
 st.markdown("""

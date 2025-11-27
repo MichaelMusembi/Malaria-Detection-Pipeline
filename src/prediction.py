@@ -29,7 +29,7 @@ class MalariaPredictionService:
     
     _instance = None
     _model: Optional[keras.Model] = None
-    _model_path: str = 'models/malaria_mobilenet.keras'
+    _model_path: str = '../models/malaria_mobilenet.keras'
     _model_loaded: bool = False
     _class_names: Tuple[str, str] = get_class_names()
     
