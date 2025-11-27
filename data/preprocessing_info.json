@@ -1,0 +1,20 @@
+{
+  "target_size": [
+    128,
+    128
+  ],
+  "class_names": [
+    "Parasitized",
+    "Uninfected"
+  ],
+  "class_encoding": {
+    "Parasitized": 1,
+    "Uninfected": 0
+  },
+  "normalization": "pixel_values_0_1",
+  "input_shape": [
+    128,
+    128,
+    3
+  ]
+}
