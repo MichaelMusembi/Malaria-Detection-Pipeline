@@ -1,8 +1,4 @@
-# 🚀 Render Blueprint for Malaria Detection System
-# Complete deployment configuration for professional hosting
-
 services:
-  # API Backend Service - Docker deployment for better performance
   - type: web
     name: malaria-detection-api
     runtime: docker
@@ -20,7 +16,6 @@ services:
       - key: MODEL_PATH
         value: /app/models/malaria_mobilenet.keras
         
-  # UI Frontend Service - Beautiful presentation app
   - type: web
     name: malaria-detection-ui
     runtime: docker
