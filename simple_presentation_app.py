@@ -725,18 +725,19 @@ with retrain_col1:
     <div class="insights-card">
         <h2 style="margin-top: 0; color: #1e293b; font-weight: 600;">📁 Upload Training Data</h2>
         <p style="color: #64748b; margin-bottom: 1rem;">
-            Upload a ZIP file containing training images organized in folders:
-            <br><strong>• Parasitized/</strong> - Images of infected cells
-            <br><strong>• Uninfected/</strong> - Images of healthy cells
+            Upload training data:
+            <br><strong>• ZIP files:</strong> Organized with Parasitized/ and Uninfected/ folders
+            <br><strong>• Individual images:</strong> PNG, JPG, JPEG for preview/testing
+            <br><em>Note: ZIP files are recommended for bulk retraining</em>
         </p>
     </div>
     """, unsafe_allow_html=True)
     
     # File uploader for training data
     uploaded_zip = st.file_uploader(
-        "Choose ZIP file with training data",
-        type=["zip"],
-        help="Upload ZIP file with Parasitized/ and Uninfected/ folders containing training images",
+        "Choose training data",
+        type=["zip", "png", "jpg", "jpeg"],
+        help="Upload ZIP file with Parasitized/ and Uninfected/ folders, or individual training images",
         key="training_zip"
     )
     
@@ -745,31 +746,49 @@ with retrain_col1:
         file_size = len(uploaded_zip.read()) / (1024 * 1024)  # MB
         uploaded_zip.seek(0)  # Reset file pointer
         
-        st.markdown(f"""
-        <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #10b981; margin: 1rem 0;">
-            <h4 style="margin: 0 0 0.5rem 0; color: #059669;">📦 File Ready</h4>
-            <p style="margin: 0; color: #047857;"><strong>File:</strong> {uploaded_zip.name}</p>
-            <p style="margin: 0; color: #047857;"><strong>Size:</strong> {file_size:.2f} MB</p>
-        </div>
-        """, unsafe_allow_html=True)
+        # Check if it's a ZIP file or individual image
+        is_zip_file = uploaded_zip.name.lower().endswith('.zip')
         
-        # Validate ZIP structure
-        try:
-            zip_content = zipfile.ZipFile(uploaded_zip)
-            files_in_zip = zip_content.namelist()
+        if is_zip_file:
+            st.markdown(f"""
+            <div style="background: #f0fdf4; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #10b981; margin: 1rem 0;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #059669;">📦 ZIP File Ready</h4>
+                <p style="margin: 0; color: #047857;"><strong>File:</strong> {uploaded_zip.name}</p>
+                <p style="margin: 0; color: #047857;"><strong>Size:</strong> {file_size:.2f} MB</p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            has_parasitized = any('parasitized' in f.lower() for f in files_in_zip)
-            has_uninfected = any('uninfected' in f.lower() for f in files_in_zip)
-            
-            if has_parasitized and has_uninfected:
-                st.success("✅ ZIP structure validated: Found both Parasitized and Uninfected folders")
-                zip_valid = True
-            else:
-                st.error("❌ Invalid ZIP structure: Missing Parasitized/ or Uninfected/ folders")
+            # Validate ZIP structure
+            try:
+                zip_content = zipfile.ZipFile(uploaded_zip)
+                files_in_zip = zip_content.namelist()
+                
+                has_parasitized = any('parasitized' in f.lower() for f in files_in_zip)
+                has_uninfected = any('uninfected' in f.lower() for f in files_in_zip)
+                
+                if has_parasitized and has_uninfected:
+                    st.success("✅ ZIP structure validated: Found both Parasitized and Uninfected folders")
+                    zip_valid = True
+                else:
+                    st.error("❌ Invalid ZIP structure: Missing Parasitized/ or Uninfected/ folders")
+                    zip_valid = False
+            except:
+                st.error("❌ Invalid ZIP file")
                 zip_valid = False
-        except:
-            st.error("❌ Invalid ZIP file")
-            zip_valid = False
+        else:
+            # Handle individual image files
+            st.markdown(f"""
+            <div style="background: #f0f9ff; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #0284c7; margin: 1rem 0;">
+                <h4 style="margin: 0 0 0.5rem 0; color: #0369a1;">🖼️ Image File Ready</h4>
+                <p style="margin: 0; color: #075985;"><strong>File:</strong> {uploaded_zip.name}</p>
+                <p style="margin: 0; color: #075985;"><strong>Size:</strong> {file_size:.2f} MB</p>
+                <p style="margin: 0; color: #075985;"><strong>Note:</strong> Individual images can be used for testing or preview</p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # For individual images, we'll allow them but note they're for preview
+            st.info("💡 Individual images are accepted for preview. For bulk retraining, use ZIP files with organized folders.")
+            zip_valid = True
     else:
         zip_valid = False
 
